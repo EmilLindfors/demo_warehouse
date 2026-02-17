@@ -26,7 +26,7 @@ jobs:
         working-directory: reports
         run: |
           cat > sources/databricks/connection.options.yaml << 'EOF'
-          token: ${{ secrets.DATABRICKS_TOKEN }}
+          token: ${{ secrets.DATABRICKS_ACCESS_TOKEN }}
           EOF
 
       - name: Install dependencies
