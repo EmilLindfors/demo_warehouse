@@ -24,10 +24,9 @@ jobs:
 
       - name: Write Databricks credentials
         working-directory: reports
-        run: |
-          cat > sources/databricks/connection.options.yaml << 'EOF'
-          token: ${{ secrets.DATABRICKS_ACCESS_TOKEN }}
-          EOF
+        env:
+          DB_TOKEN: ${{ secrets.DATABRICKS_ACCESS_TOKEN }}
+        run: printf 'token: "%s"\n' "$DB_TOKEN" > sources/databricks/connection.options.yaml
 
       - name: Install dependencies
         working-directory: reports
