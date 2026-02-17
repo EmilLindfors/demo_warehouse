@@ -1,0 +1,89 @@
+version: 2
+
+models:
+  - name: dim_el_area
+    description: >
+      Dimension table for Norwegian electricity price areas (NO1-NO5)
+      with area names and dynamic weather station counts.
+    columns:
+      - name: el_area
+        description: Electricity price area code (NO1-NO5)
+        tests:
+          - unique
+          - not_null
+      - name: area_name
+        description: Norwegian name for the area (e.g. Øst-Norge)
+      - name: weather_station_count
+        description: Number of distinct weather stations providing data for this area
+
+  - name: fct_reservoir_weekly
+    description: >
+      Fact table with weekly reservoir fill levels per electricity area,
+      enriched with historical context and year-over-year comparisons.
+      Primary grain: one row per el_area per week.
+    columns:
+      - name: el_area
+        description: Electricity price area (NO1-NO5)
+        tests:
+          - not_null
+      - name: observation_date
+        description: Week start date
+        tests:
+          - not_null
+      - name: fill_pct
+        description: Reservoir fill level as percentage (0-100)
+      - name: fill_status
+        description: "Classification vs historical norms"
+      - name: fill_pct_yoy_change
+        description: Change compared to same week previous year
+
+  - name: rpt_reservoir_trends
+    description: >
+      Report-ready model showing reservoir fill trends over time with
+      historical bands (min/max/median), year-over-year comparison,
+      YTD extremes, and 12-week moving averages.
+    columns:
+      - name: el_area
+        description: Electricity price area
+      - name: area_name
+        description: Norwegian area name
+      - name: fill_pct
+        description: Current week fill percentage
+      - name: fill_pct_yoy_change
+        description: Year-over-year change
+      - name: fill_pct_12w_avg
+        description: 12-week rolling average of fill percentage
+
+  - name: rpt_precipitation_trends
+    description: >
+      Report-ready model showing weekly precipitation trends with
+      year-over-year comparison, cumulative YTD totals, and
+      12-week rolling averages. Precipitation is averaged across
+      all weather stations in each electricity area.
+    columns:
+      - name: el_area
+        description: Electricity price area
+      - name: area_name
+        description: Norwegian area name
+      - name: station_count
+        description: Number of weather stations contributing data
+      - name: weekly_precipitation_mm
+        description: Average weekly precipitation across stations
+      - name: ytd_cumulative_precipitation_mm
+        description: Year-to-date cumulative precipitation
+
+  - name: rpt_biggest_changes
+    description: >
+      All weeks with reservoir fill changes and precipitation values
+      per area, with a change_type discriminator. No ranking is applied;
+      consumers select their own top-N. Useful for identifying extreme
+      weather events and their impact on reservoirs.
+    columns:
+      - name: el_area
+        description: Electricity price area
+      - name: change_type
+        description: "Type: reservoir_fill_change or precipitation_peak"
+      - name: fill_pct_change
+        description: Week-over-week change in fill percentage
+      - name: weekly_precipitation_mm
+        description: Weekly precipitation in mm

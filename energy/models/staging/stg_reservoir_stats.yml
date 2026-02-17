@@ -1,0 +1,69 @@
+version: 2
+
+models:
+  - name: stg_precipitation
+    description: >
+      Cleaned daily precipitation data per weather station / electricity area.
+      Filters out null precipitation readings.
+    columns:
+      - name: station_id
+        description: Weather station identifier
+      - name: el_area
+        description: Electricity price area (NO1-NO5)
+      - name: observation_date
+        description: Date of the observation
+        tests:
+          - not_null
+      - name: precipitation_mm
+        description: Daily precipitation in mm
+        tests:
+          - not_null
+      - name: is_verified
+        description: Whether the measurement passed quality control (quality_code = 0)
+
+  - name: stg_reservoir_stats
+    description: >
+      Weekly reservoir fill levels for the 5 Norwegian electricity price areas (NO1-NO5).
+      Converts NVE fractions to percentages and renames Norwegian columns to English.
+    columns:
+      - name: el_area
+        description: Electricity price area (NO1-NO5)
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['NO1', 'NO2', 'NO3', 'NO4', 'NO5']
+      - name: observation_date
+        description: Week start date
+        tests:
+          - not_null
+      - name: fill_pct
+        description: Reservoir fill level as percentage (0-100)
+      - name: capacity_twh
+        description: Total reservoir capacity in TWh
+      - name: fill_twh
+        description: Current fill level in TWh
+
+  - name: stg_reservoir_min_max_median
+    description: >
+      Historical min/max/median reservoir fill levels per ISO week for each
+      electricity area. Computed from actual observations in stg_reservoir_stats
+      to ensure consistency with current data.
+    columns:
+      - name: el_area
+        description: Electricity price area (NO1-NO5)
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['NO1', 'NO2', 'NO3', 'NO4', 'NO5']
+      - name: iso_week
+        description: ISO week number (1-53)
+        tests:
+          - not_null
+      - name: min_fill_pct
+        description: Historical minimum fill level (percentage 0-100)
+      - name: max_fill_pct
+        description: Historical maximum fill level (percentage 0-100)
+      - name: median_fill_pct
+        description: Historical median fill level (percentage 0-100)

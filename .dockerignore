@@ -1,0 +1,9 @@
+.env
+.dlt/
+.git/
+target/
+energy/
+reports/
+*.csv
+__pycache__/
+.nve_magasin/

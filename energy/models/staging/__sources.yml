@@ -1,0 +1,82 @@
+version: 2
+
+sources:
+  - name: raw_frost
+    database: workspace
+    schema: raw_frost
+    description: Precipitation data from frost.met.no (Norwegian Meteorological Institute)
+    tables:
+      - name: precipitation
+        description: Daily precipitation measurements for 5 weather stations (one per electricity area NO1-NO5)
+        columns:
+          - name: station_id
+            description: Weather station identifier (e.g. SN18700)
+          - name: station_name
+            description: Human-readable station name
+          - name: el_area
+            description: Electricity price area (NO1-NO5)
+          - name: reference_time
+            description: Observation date
+          - name: precipitation_mm
+            description: Daily precipitation in millimeters
+          - name: quality_code
+            description: Data quality code from MET (0 = verified)
+          - name: ingested_at
+            description: Timestamp when the row was loaded
+
+  - name: raw_nve
+    database: workspace
+    schema: raw_nve
+    description: Reservoir statistics from NVE (Norwegian Water Resources and Energy Directorate)
+    tables:
+      - name: reservoir_stats
+        description: Weekly reservoir fill levels per area, from 2000 to present
+        columns:
+          - name: dato_id
+            description: Date identifier (ISO date string, typically a Monday)
+          - name: omr_type
+            description: "Area type: EL (electricity), NO (national), VASS (hydrological)"
+          - name: omrnr
+            description: "Area number (1-5 for EL areas, maps to NO1-NO5)"
+          - name: iso_aar
+            description: ISO year
+          - name: iso_uke
+            description: ISO week number
+          - name: fyllingsgrad
+            description: Fill level as fraction (0.0 - 1.0)
+          - name: kapasitet_t_wh
+            description: Total reservoir capacity in TWh
+          - name: fylling_t_wh
+            description: Current fill level in TWh
+          - name: fyllingsgrad_forrige_uke
+            description: Fill level previous week (fraction)
+          - name: endring_fyllingsgrad
+            description: Week-over-week change in fill level
+      - name: reservoir_min_max_median
+        description: Pre-computed historical min/max/median fill levels per area per ISO week (from NVE)
+        columns:
+          - name: omr_type
+            description: "Area type: EL (electricity), NO (national), VASS (hydrological)"
+          - name: omrnr
+            description: "Area number (1-5 for EL areas, maps to NO1-NO5)"
+          - name: iso_uke
+            description: ISO week number
+          - name: min_fyllingsgrad
+            description: Historical minimum fill level (fraction 0.0 - 1.0)
+          - name: max_fyllingsgrad
+            description: Historical maximum fill level (fraction 0.0 - 1.0)
+          - name: median_fyllings_grad
+            description: Historical median fill level (fraction 0.0 - 1.0)
+      - name: areas__elspot
+        description: Electricity spot price areas (NO1-NO5) with Norwegian names and descriptions
+        columns:
+          - name: navn
+            description: Short area name (e.g. "NO 1")
+          - name: navn_langt
+            description: Long area name (e.g. "Elspotområde 1")
+          - name: beskrivelse
+            description: Norwegian description of the area's geographic coverage
+          - name: omr_type
+            description: "Area type: always EL for elspot areas"
+          - name: omrnr
+            description: "Area number (1-5)"

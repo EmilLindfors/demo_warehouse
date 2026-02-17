@@ -1,0 +1,61 @@
+# Frost CLI — precipitation data pipeline
+
+# Default: show available recipes
+default:
+    @just --list
+
+# List available weather stations (all areas)
+stations:
+    cargo run --release -- stations
+
+# List stations for a specific area (e.g. just stations NO1)
+stations-area area:
+    cargo run --release -- stations --areas {{ area }}
+
+# Fetch yesterday's precipitation data and load into Databricks
+ingest-latest:
+    cargo run --release -- ingest \
+        --from "{{ `python -c "from datetime import date, timedelta; print(date.today() - timedelta(days=1))"` }}" \
+        --to "{{ `python -c "from datetime import date; print(date.today())"` }}" \
+        --output databricks
+
+# Fetch 10 years of historical data (parallel)
+ingest-all:
+    cargo run --release -- ingest \
+        --from 2015-01-01 \
+        --to "{{ `python -c "from datetime import date; print(date.today())"` }}" \
+        --output databricks \
+        --parallel
+
+# Fetch a specific date range
+ingest from to:
+    cargo run --release -- ingest \
+        --from {{ from }} \
+        --to {{ to }} \
+        --output databricks \
+        --parallel
+
+# Dump latest day to CSV for debugging
+debug-latest:
+    cargo run -- ingest \
+        --from "{{ `python -c "from datetime import date, timedelta; print(date.today() - timedelta(days=1))"` }}" \
+        --to "{{ `python -c "from datetime import date; print(date.today())"` }}" \
+        --output csv \
+        --csv-path latest.csv
+
+# Dump full history to CSV for debugging
+debug-all:
+    cargo run -- ingest \
+        --from 2015-01-01 \
+        --to "{{ `python -c "from datetime import date; print(date.today())"` }}" \
+        --output csv \
+        --csv-path all.csv \
+        --parallel
+
+# Build release binary
+build:
+    cargo build --release
+
+# Run clippy
+lint:
+    cargo clippy

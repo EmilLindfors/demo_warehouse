@@ -1,0 +1,9 @@
+appearance:
+  default_theme: system
+  show_theme_switcher: true
+
+plugins:
+  components:
+    "@evidence-dev/core-components": {}
+  datasources:
+    "@evidence-dev/databricks": {}

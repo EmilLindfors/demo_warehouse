@@ -1,0 +1,25 @@
+# Secrets
+.env
+
+# Build artifacts
+target/
+**/target/
+databricks.exe
+logs/
+**/logs/
+
+# Rust (frost/)
+frost/target/
+
+# dbt (energy/)
+energy/dbt_packages/
+energy/dbt_internal_packages/
+energy/target/
+energy/logs/
+
+# Evidence.dev (reports/)
+reports/node_modules/
+reports/.evidence/
+reports/build/
+reports/.svelte-kit/
+**/connection.options.yaml

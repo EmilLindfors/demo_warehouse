@@ -1,0 +1,92 @@
+version: 2
+
+models:
+  - name: int_precipitation_weekly
+    description: >
+      Daily precipitation aggregated to ISO-week level per electricity area.
+      Averages across all weather stations in each area to produce a single
+      representative value. Aligns with the weekly reservoir data granularity.
+    columns:
+      - name: el_area
+        description: Electricity price area (NO1-NO5)
+        tests:
+          - not_null
+      - name: iso_year
+        description: ISO year
+      - name: iso_week
+        description: ISO week number
+      - name: week_start_date
+        description: First observation date in the week
+      - name: week_end_date
+        description: Last observation date in the week
+      - name: station_count
+        description: Number of distinct weather stations contributing data
+      - name: weekly_precipitation_mm
+        description: Average total weekly precipitation across stations (mm)
+      - name: avg_daily_precipitation_mm
+        description: Average daily precipitation across stations (mm)
+      - name: max_daily_precipitation_mm
+        description: Maximum single-day precipitation across all stations (mm)
+      - name: avg_rainy_days
+        description: Average number of days with precipitation > 0 across stations
+      - name: min_station_weekly_mm
+        description: Lowest station weekly total (mm)
+      - name: max_station_weekly_mm
+        description: Highest station weekly total (mm)
+      - name: avg_days_with_data
+        description: Average number of days with data per station
+
+  - name: int_reservoir_enriched
+    description: >
+      Reservoir stats enriched with historical min/max/median context and
+      year-over-year comparisons. Core building block for mart layer.
+    columns:
+      - name: el_area
+        description: Electricity price area (NO1-NO5)
+        tests:
+          - not_null
+      - name: observation_date
+        description: Week start date
+        tests:
+          - not_null
+      - name: fill_pct
+        description: Current fill level as percentage (0-100)
+      - name: fill_status
+        description: "Classification: historic_low, below_normal, normal, above_normal, historic_high"
+      - name: fill_pct_yoy_change
+        description: Year-over-year change in fill percentage
+      - name: fill_pct_vs_median
+        description: Deviation from historical median
+
+  - name: int_dimensions
+    description: >
+      Electricity area reference data with Norwegian area names and
+      weather station counts. Single source of truth for area metadata
+      used by all mart models.
+    columns:
+      - name: el_area
+        description: Electricity price area code (NO1-NO5)
+        tests:
+          - unique
+          - not_null
+      - name: area_number
+        description: Numeric area identifier (1-5)
+      - name: area_name
+        description: Norwegian name for the area (e.g. Øst-Norge)
+      - name: weather_station_count
+        description: Number of distinct weather stations providing data for this area
+
+  - name: int_stations
+    description: >
+      Distinct list of weather stations with their electricity area mapping.
+      Derived from precipitation observations.
+    columns:
+      - name: station_id
+        description: Frost API station identifier (e.g. SN18700)
+        tests:
+          - unique
+          - not_null
+      - name: station_name
+        description: Human-readable station name
+      - name: el_area
+        description: Electricity price area the station belongs to

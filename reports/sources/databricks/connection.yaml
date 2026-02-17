@@ -1,0 +1,6 @@
+# Evidence Databricks connection (non-sensitive values)
+name: databricks
+type: databricks
+options:
+  host: dbc-f6f58111-9839.cloud.databricks.com
+  path: /sql/1.0/warehouses/66071776da4067e0
