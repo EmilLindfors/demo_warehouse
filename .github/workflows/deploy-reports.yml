@@ -20,13 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install dependencies
-        working-directory: reports
-        run: npm ci
+      - uses: oven-sh/setup-bun@v2
 
       - name: Write Databricks credentials
         working-directory: reports
@@ -35,9 +29,13 @@ jobs:
           token: ${{ secrets.DATABRICKS_TOKEN }}
           EOF
 
+      - name: Install dependencies
+        working-directory: reports
+        run: bun install
+
       - name: Build Evidence site
         working-directory: reports
-        run: npm run sources && npm run build
+        run: bun run sources && bun run build
 
       - uses: actions/upload-pages-artifact@v3
         with:
