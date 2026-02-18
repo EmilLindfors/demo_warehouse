@@ -2,6 +2,9 @@ appearance:
   default_theme: system
   show_theme_switcher: true
 
+deployment:
+  basePath: /demo_warehouse
+
 plugins:
   components:
     "@evidence-dev/core-components": {}

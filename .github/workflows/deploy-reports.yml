@@ -30,6 +30,7 @@ jobs:
         working-directory: reports
         env:
           EVIDENCE_SOURCE__databricks__token: ${{ secrets.DATABRICKS_ACCESS_TOKEN }}
+          BASE_PATH: /${{ github.event.repository.name }}
         run: bun run sources && bun run build
 
       - uses: actions/upload-pages-artifact@v3
